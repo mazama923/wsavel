@@ -34,6 +34,6 @@ func main() {
 	if backupFilePath != "" {
 		log.Info("Backup available: %s", backupFilePath)
 	} else {
-		log.Info("No need to make a backup", "err", "The last backup is less than %s days old", argumentLoad.MinDays)
+		log.Info("No need to make a backup", "err", "The last backup is less than your <min_days>")
 	}
 }
