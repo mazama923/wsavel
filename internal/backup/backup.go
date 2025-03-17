@@ -26,7 +26,7 @@ func BackupWSL(wslname, backupPath string, maxkeep, mindays int, compress bool) 
   fmt.Println("Check min days passed")
 
 	date := time.Now().Format("2006-01-02") // Format YYYY-MM-DD
-	backupFilePath := fmt.Sprintf("%s/%s-backup-%s.tar", backupPath, wslname, date)
+	backupFilePath := fmt.Sprintf("%s\%s-backup-%s.tar", backupPath, wslname, date)
 
 	if err := exportWSL(wslname, backupFilePath); err != nil {
 		return "", err
