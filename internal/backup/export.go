@@ -7,11 +7,11 @@ import (
 	"github.com/mazama923/wsavel/internal/ui"
 )
 
-func exportWSL(wslname, backupFilePath string) error {
+func exportWSL(wslName, backupFilePath string) error {
 	go ui.StartSpinner("Exporting WSL...")
 	defer ui.StopSpinner()
 
-	cmd := exec.Command("wsl", "--export", wslname, backupFilePath)
+	cmd := exec.Command("wsl", "--export", wslName, backupFilePath)
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("exporting WSL: %w", err)
 	}

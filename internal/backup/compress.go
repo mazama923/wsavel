@@ -47,6 +47,5 @@ func compressBackup(backupFilePath string) error {
 	if err := os.Remove(backupFilePath); err != nil {
 		return fmt.Errorf("deleting original backup file: %w", err)
 	}
-
 	return nil
 }

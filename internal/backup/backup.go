@@ -5,33 +5,26 @@ import (
 	"time"
 )
 
-func BackupWSL(wslname, backupPath string, maxkeep, mindays int, compress bool) (string, error) {
+func BackupWSL(wslName, backupPath string, maxKeep, minDays int, compress bool) (string, error) {
 	if err := checkBackupPath(backupPath); err != nil {
 		return "", err
 	}
 
-  fmt.Println("Check backup path passed")
-
-	numberOfDaysOfLastBackup, err := dateOfLastBackup(wslname, backupPath)
+	numberOfDaysOfLastBackup, err := dateOfLastBackup(wslName, backupPath)
 	if err != nil {
 		return "", err
 	}
 
-  fmt.Println("Check date of last backup passed")
-
-	if numberOfDaysOfLastBackup < mindays {
+	if numberOfDaysOfLastBackup < minDays {
 		return "", nil
 	}
 
-  fmt.Println("Check min days passed")
-
 	date := time.Now().Format("2006-01-02") // Format YYYY-MM-DD
-	backupFilePath := fmt.Sprintf("%s\%s-backup-%s.tar", backupPath, wslname, date)
+	backupFilePath := fmt.Sprintf("%s\\%s-backup-%s.tar", backupPath, wslName, date)
 
-	if err := exportWSL(wslname, backupFilePath); err != nil {
+	if err := exportWSL(wslName, backupFilePath); err != nil {
 		return "", err
 	}
-  fmt.Println("Export WSL passed")
 
 	if compress {
 		if err := compressBackup(backupFilePath); err != nil {
@@ -39,6 +32,10 @@ func BackupWSL(wslname, backupPath string, maxkeep, mindays int, compress bool) 
 		}
 		backupFilePath += ".gz"
 	}
+
+  if err := cleanBackups(wslName, backupFilePath, maxKeep); err != nil {
+		return "", err
+  }
 
 	return backupFilePath, nil
 }

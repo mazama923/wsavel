@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func dateOfLastBackup(wslname, backupPath string) (int, error) {
+func dateOfLastBackup(wslName, backupPath string) (int, error) {
 	numberOfDaysOfLastBackup := 9999 // Default value if no file exists to trigger numberOfDaysOfLastBackup < mindays
 	var latestModTime time.Time
 	found := false
@@ -17,7 +17,7 @@ func dateOfLastBackup(wslname, backupPath string) (int, error) {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && strings.Contains(info.Name(), fmt.Sprintf("%s-backup-", wslname)) {
+		if !info.IsDir() && strings.Contains(info.Name(), fmt.Sprintf("%s-backup-", wslName)) {
 			if !found || info.ModTime().After(latestModTime) {
 				latestModTime = info.ModTime()
 				found = true
