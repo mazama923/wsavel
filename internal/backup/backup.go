@@ -20,14 +20,15 @@ func BackupWSL(wslName, backupPath string, maxKeep, minDays int, compress bool) 
 	}
 
 	date := time.Now().Format("2006-01-02") // Format YYYY-MM-DD
-	backupFilePath := fmt.Sprintf("%s\\%s-backup-%s.tar", backupPath, wslName, date)
+  backupFileName := fmt.Sprintf("%s-backup-%s.tar", wslName, date)
+	backupFilePath := fmt.Sprintf("%s\\%s", backupPath, backupFileName)
 
 	if err := exportWSL(wslName, backupFilePath); err != nil {
 		return "", err
 	}
 
 	if compress {
-		if err := compressBackup(backupFilePath); err != nil {
+		if err := compressBackup(wslName, backupPath, backupFileName); err != nil {
 			return "", err
 		}
 		backupFilePath += ".gz"
