@@ -2,17 +2,19 @@ package ui
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-var done chan bool
+type errMsg error
 
 type model struct {
 	spinner  spinner.Model
 	quitting bool
+	err      error
 	message  string
 }
 
@@ -20,11 +22,7 @@ func initialModel(message string) model {
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
-
-	return model{
-		spinner: s,
-		message: message,
-	}
+	return model{spinner: s, message: message}
 }
 
 func (m model) Init() tea.Cmd {
@@ -32,10 +30,20 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	select {
-	case <-done:
-		m.quitting = true
-		return m, tea.Quit
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q", "esc", "ctrl+c":
+			m.quitting = true
+			return m, tea.Quit
+		default:
+			return m, nil
+		}
+
+	case errMsg:
+		m.err = msg
+		return m, nil
+
 	default:
 		var cmd tea.Cmd
 		m.spinner, cmd = m.spinner.Update(msg)
@@ -44,6 +52,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	if m.err != nil {
+		return m.err.Error()
+	}
 	str := fmt.Sprintf("\n\n   %s %s\n\n", m.spinner.View(), m.message)
 	if m.quitting {
 		return str + "\n"
@@ -52,17 +63,9 @@ func (m model) View() string {
 }
 
 func StartSpinner(message string) {
-	done = make(chan bool)
-	m := initialModel(message)
-
-	p := tea.NewProgram(m)
-	go func() {
-		p.Run()
-	}()
-}
-
-func StopSpinner() {
-	if done != nil {
-		close(done)
+	p := tea.NewProgram(initialModel(message))
+	if _, err := p.Run(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }

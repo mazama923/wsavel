@@ -10,8 +10,7 @@ import (
 func exportWSL(wslName, backupFilePath string) error {
 	cmd := exec.Command("wsl", "--export", wslName, backupFilePath)
 	logExecCMD := fmt.Sprintf("Exporting WSL: %s", cmd.String())
-	ui.StartSpinner(logExecCMD)
-	defer ui.StopSpinner()
+	go ui.StartSpinner(logExecCMD)
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("exporting WSL: %w", err)
 	}

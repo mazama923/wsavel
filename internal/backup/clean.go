@@ -10,8 +10,7 @@ import (
 )
 
 func cleanBackups(wslName, backupPath string, maxKeep int) error {
-	ui.StartSpinner("Cleaning backups...")
-	defer ui.StopSpinner()
+	go ui.StartSpinner("Cleaning backups ...")
 
 	files, err := os.ReadDir(backupPath)
 	if err != nil {
