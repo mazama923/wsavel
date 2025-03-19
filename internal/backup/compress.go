@@ -3,15 +3,20 @@ package backup
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/mazama923/wsavel/internal/ui"
 )
 
 func compressBackup(wslName, backupPath, backupFileName string) error {
-	go ui.StartSpinner("Compressing backup...")
-	defer ui.StopSpinner()
+	// Convert Windows path to WSL path
+	wslBackupPath := strings.Replace(backupPath, "C:\\", "/mnt/c/", 1)
+	wslBackupPath = strings.Replace(wslBackupPath, "\\", "/", -1)
 
-	cmd := exec.Command("wsl", "-d", wslName, "-- cd ", backupPath, "gzip", backupFileName)
+	cmd := exec.Command("wsl", "-d", wslName, "sh", "-c", fmt.Sprintf("cd %s && gzip %s", wslBackupPath, backupFileName))
+	logExecCMD := fmt.Sprintf("Compressing backup.: %s", cmd.String())
+	go ui.StartSpinner(logExecCMD)
+	defer ui.StopSpinner()
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("compressing backup: %w", err)
 	}

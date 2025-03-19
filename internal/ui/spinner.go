@@ -44,10 +44,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	str := fmt.Sprintf("\n\n   %s %s\n\n", m.spinner.View(), m.message)
 	if m.quitting {
-		return ""
+		return str + "\n"
 	}
-	return fmt.Sprintf("\n%s %s\n", m.spinner.View(), m.message)
+	return str
 }
 
 func StartSpinner(message string) {
