@@ -61,6 +61,14 @@ func StartSpinner(message string) {
 	}()
 }
 
+func TestSpinner(message string) {
+	done = make(chan bool)
+	m := initialModel(message)
+
+	p := tea.NewProgram(m)
+	p.Run()
+}
+
 func StopSpinner() {
 	if done != nil {
 		close(done)

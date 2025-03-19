@@ -13,7 +13,7 @@ func compressBackup(wslName, backupPath, backupFileName string) error {
 	wslBackupPath := strings.Replace(backupPath, "C:\\", "/mnt/c/", 1)
 	wslBackupPath = strings.Replace(wslBackupPath, "\\", "/", -1)
 
-	cmd := exec.Command("wsl", "-d", wslName, "sh", "-c", fmt.Sprintf("cd %s && gzip %s", wslBackupPath, backupFileName))
+	cmd := exec.Command("wsl", "-d", wslName, "sh", "-c", fmt.Sprintf("gzip %s/%s", wslBackupPath, backupFileName))
 	logExecCMD := fmt.Sprintf("Compressing backup.: %s", cmd.String())
 	go ui.StartSpinner(logExecCMD)
 	defer ui.StopSpinner()

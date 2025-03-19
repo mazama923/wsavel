@@ -9,7 +9,7 @@ import (
 	"github.com/mazama923/wsavel/internal/ui"
 )
 
-func cleanBackups(backupPath, wslName string, maxKeep int) error {
+func cleanBackups(wslName, backupPath string, maxKeep int) error {
 	go ui.StartSpinner("Cleaning backups...")
 	defer ui.StopSpinner()
 

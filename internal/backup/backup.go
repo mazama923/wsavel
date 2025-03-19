@@ -34,7 +34,7 @@ func BackupWSL(wslName, backupPath string, maxKeep, minDays int, compress bool) 
 		backupFilePath += ".gz"
 	}
 
-	if err := cleanBackups(wslName, backupFilePath, maxKeep); err != nil {
+	if err := cleanBackups(wslName, backupPath, maxKeep); err != nil {
 		return "", err
 	}
 
