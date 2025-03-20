@@ -2,7 +2,6 @@ package ui
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -11,12 +10,16 @@ import (
 
 type errMsg error
 
+type updateMessageMsg string
+
 type model struct {
 	spinner  spinner.Model
 	quitting bool
 	err      error
 	message  string
 }
+
+var activeProgram *tea.Program
 
 func initialModel(message string) model {
 	s := spinner.New()
@@ -33,7 +36,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q", "esc", "ctrl+c":
+		case "ctrl+c":
 			m.quitting = true
 			return m, tea.Quit
 		default:
@@ -42,6 +45,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case errMsg:
 		m.err = msg
+		return m, nil
+
+	case updateMessageMsg:
+		m.message = string(msg)
 		return m, nil
 
 	default:
@@ -64,8 +71,25 @@ func (m model) View() string {
 
 func StartSpinner(message string) {
 	p := tea.NewProgram(initialModel(message))
-	if _, err := p.Run(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	activeProgram = p
+
+	// Exécuter le programme dans une goroutine
+	go func() {
+		if _, err := p.Run(); err != nil {
+			fmt.Println(err)
+		}
+	}()
+}
+
+func UpdateSpinnerMessage(newMessage string) {
+	if activeProgram != nil {
+		activeProgram.Send(updateMessageMsg(newMessage))
+	}
+}
+
+func StopSpinner() {
+	if activeProgram != nil {
+		activeProgram.Quit()
+		activeProgram = nil
 	}
 }
