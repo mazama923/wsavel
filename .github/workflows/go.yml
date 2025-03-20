@@ -1,0 +1,53 @@
+name: Release Binary
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Get Latest Tag
+        id: get_latest_tag
+        run: |
+          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1)
+          if [[ -z "$LATEST_TAG" ]]; then
+            NEW_TAG="v1"
+          else
+            NUM=${LATEST_TAG#v}
+            NEW_TAG="v$((NUM + 1))"
+          fi
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+      - name: Build Binary
+        run: |
+          GOOS=windows GOARCH=amd64 go build -o wsavel.exe ./cmd/wsavel/main.go
+
+      - name: Create Tag
+        run: |
+          git tag ${{ env.NEW_TAG }}
+          git push origin ${{ env.NEW_TAG }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+          name: "Release ${{ env.NEW_TAG }}"
+          draft: false
+          prerelease: false
+          files: wsavel.exe
+        env:
+          TOKEN_FOR_RELEASE: ${{ secrets.TOKEN_FOR_RELEASE }}
