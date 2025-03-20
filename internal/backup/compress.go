@@ -15,7 +15,7 @@ func compressBackup(wslName, backupPath, backupFileName string) error {
 
 	cmd := exec.Command("wsl", "-d", wslName, "sh", "-c", fmt.Sprintf("gzip %s/%s", wslBackupPath, backupFileName))
 	logExecCMD := fmt.Sprintf("Compressing backup.: %s", cmd.String())
-	go ui.StartSpinner(logExecCMD)
+	ui.StartSpinner(logExecCMD)
 	defer ui.StopSpinner()
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("compressing backup: %w", err)
